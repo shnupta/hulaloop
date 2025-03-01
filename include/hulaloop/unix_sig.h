@@ -1,6 +1,7 @@
 #pragma once
 
 #include "signal.h"
+#include "sys.h"
 
 #include <stdexcept>
 #include <string>

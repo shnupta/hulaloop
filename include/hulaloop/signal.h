@@ -83,7 +83,7 @@ public:
 					});
 		}
 
-		return closer([=]() { disconnect(id); });
+		return closer([=, this]() { disconnect(id); });
 	}
 
 private:

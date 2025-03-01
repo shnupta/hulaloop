@@ -5,7 +5,6 @@
 #include "signal.h"
 
 #include <algorithm>
-#include <csignal>
 #include <unordered_map>
 #include <vector>
 #include <chrono>
@@ -21,8 +20,8 @@ using namespace std::chrono_literals;
 namespace hula {
 
 namespace test {
-class loop_test;
-class fake_clock_loop_test;
+struct loop_test;
+struct fake_clock_loop_test;
 }
 
 // generic callback
@@ -116,7 +115,7 @@ public:
 	[[nodiscard]] closer schedule(std::chrono::nanoseconds fire_in, callback cb)
 	{
 		auto id = post(fire_in, cb);
-		return closer([=] { cancel_callback(id); });
+		return closer([=, this] { cancel_callback(id); });
 	}
 
 	// cancels the callback with the given id if it exists.
@@ -230,7 +229,7 @@ private:
 		auto& handler = it->second;
 		if (inserted)
 		{
-			handler._closer = unix::signal_registry::connect(s, [=] { _queued_unix_signals.push_back(s); });
+			handler._closer = unix::signal_registry::connect(s, [=, this] { _queued_unix_signals.push_back(s); });
 		}
 		return handler._signal;
 	}
@@ -248,8 +247,8 @@ private:
 	std::deque<unix::sig> _queued_unix_signals;
 
 
-	friend class test::loop_test;
-	friend class test::fake_clock_loop_test;
+	friend struct test::loop_test;
+	friend struct test::fake_clock_loop_test;
 };
 
 }
