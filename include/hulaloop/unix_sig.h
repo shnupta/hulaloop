@@ -39,17 +39,13 @@ enum class sig
 	sigchld = SIGCHLD,
 	sigttin = SIGTTIN,
 	sigttou = SIGTTOU,
-#if (!defined(_HULA_UNIX) || defined(_HULA_MAC))
 	sigio = SIGIO,
-#endif
 	sigxpu = SIGXCPU,
 	sigxfsz = SIGXFSZ,
 	sigvtalrm = SIGVTALRM,
 	sigprof = SIGPROF,
-#if (!defined(_HULA_UNIX) || defined(_HULA_MAC))
 	sigwinch = SIGWINCH,
 	siginfo = SIGINFO,
-#endif
 	sigusr1 = SIGUSR1,
 	sigusr2 = SIGUSR2
 };
