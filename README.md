@@ -95,4 +95,4 @@ There are two main interfaces to the `hula::loop`. `post` and `schedule`.
 
 `schedule` is the stricter of the two interfaces. It returns a `hula::closer` which is a function that can be called _once_. 
 
-A `hula::closer` also 'closes' on destruction. It is intended to be the safer of the two interfaces, as you can hold a closer in a class that may be destructed at some point in the future, at which point the `hula::closer` 'closes' and you have the guarantee that your slot will not be called.
+If you prefer to manually remove the registered callback you can do so with `hula::loop::cancel_callback(id)`.
