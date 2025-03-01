@@ -55,7 +55,7 @@ jobs:
         echo "generating coverage info"
         lcov --capture --directory build --output-file coverage.info
         echo "filtering coverage info"
-        lcov --remove coverage.info '/usr/*' 'tests/*' 'demos/*' --output-file coverage_filtered.info
+        lcov --remove coverage.info '/usr/*' 'demos/*' --output-file coverage_filtered.info
         echo "generating coverage report"
         genhtml coverage_filtered.info --output-directory coverage_report --verbose
     - name: upload coverage report as artifact
