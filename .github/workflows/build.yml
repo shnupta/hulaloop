@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: build
 
 on:
   push:
@@ -34,6 +34,8 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
+  # TODO: build release, versioning, package manager support?
+
   build_coverage:
 
     runs-on: ubuntu-latest
@@ -57,11 +59,8 @@ jobs:
         ctest --output-on-failure
     - name: generate coverage
       run: |
-        echo "generating coverage info"
         lcov --capture --directory build --output-file coverage.info
-        echo "filtering coverage info"
         lcov --remove coverage.info '/usr/*' 'tests/*' --output-file coverage_filtered.info
-        echo "generating coverage report"
         genhtml coverage_filtered.info --output-directory coverage_report --verbose
     - name: upload coverage report as artifact
       uses: actions/upload-artifact@v4

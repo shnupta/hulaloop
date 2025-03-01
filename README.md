@@ -1,5 +1,5 @@
 # hulaloop ⭕️
-![Build Status](https://github.com/shnupta/hulaloop/actions/workflows/c-cpp.yml/badge.svg)
+![Build Status](https://github.com/shnupta/hulaloop/actions/workflows/build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/shnupta/hulaloop/graph/badge.svg?token=8QP83GK99O)](https://codecov.io/gh/shnupta/hulaloop)
 
 A header-only C++ event loop.
@@ -8,7 +8,7 @@ A header-only C++ event loop.
 How do you use this thing?
 
 ### Signals and Slots
-Somewhat inspired by QT, a `hula::signal<T, Tag>` represents a function that can fire, by calling any connected `hula::slot<T, Tag>`.
+Somewhat inspired by Qt, a `hula::signal<T, Tag>` represents a function that can fire, by calling any connected `hula::slot<T, Tag>`.
 
 If you wish to notify some part of your application of a given event, with some type `T`, create a `hula::signal<T>` and allow other parts of your application to connect to that signal. Later fire the signal and the registered slots will be fired.
 
