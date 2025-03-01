@@ -36,10 +36,10 @@ TEST_CASE("signal void signal slot disconnects before call", "[signal]")
 
 TEST_CASE("signal void signal connect during call", "[signal]")
 {
-	closer inner;
+	signal<> s;
 	bool once = false;
 	int val = 1;
-	signal<> s;
+	closer inner;
 
 	auto c = s.connect([&] {
 			if (!once)

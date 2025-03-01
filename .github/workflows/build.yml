@@ -1,5 +1,7 @@
 name: build
 
+# TODO: release build, versioning, package manager support
+
 on:
   push:
     branches: [ "main" ]
@@ -7,7 +9,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_debug:
+  build_debug_sanitize:
 
     runs-on: ubuntu-latest
 
@@ -22,7 +24,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DHULA_BUILD_DEMOS=ON ..
+        cmake -DHULA_DEMOS=ON -DHULA_SANITIZE=ON ..
         make
     - name: test
       run: |
@@ -33,8 +35,6 @@ jobs:
       uses: codecov/test-results-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-
-  # TODO: build release, versioning, package manager support?
 
   build_coverage:
 
@@ -51,12 +51,17 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DHULA_BUILD_DEMOS=ON -DHULA_COVERAGE=ON ..
+        cmake -DHULA_DEMOS=ON -DHULA_COVERAGE=ON ..
         make
     - name: test
       run: |
         cd build
-        ctest --output-on-failure
+        ctest --output-junit unit_test_results.xml --output-on-failure
+    - name: upload test results to codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: generate coverage
       run: |
         lcov --capture --directory build --output-file coverage.info
@@ -68,6 +73,33 @@ jobs:
         name: coverage-report
         path: coverage_report
     - uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  build_release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: fetch dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y catch2
+    - name: build
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DHULA_DEMOS=ON ..
+        make
+    - name: test
+      run: |
+        cd build
+        ctest --output-junit unit_test_results.xml --output-on-failure
+    - name: upload test results to codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
