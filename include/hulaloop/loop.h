@@ -255,9 +255,14 @@ class loop {
 
     if (poll_res > 0) {
       _processing_fds = true;
-      for (auto i = 0; i < _pollfds.size(); ++i) {
+      for (size_t i = 0; i < _pollfds.size(); ++i) {
         auto pfd = _pollfds.at(i);
         auto& handler = _fd_handlers.at(i);
+
+        if (handler._active && (pfd.revents & (POLLERR | POLLHUP))) {
+          handler.error(pfd.fd);
+        }
+
         if (handler._active && handler.want_read() && (pfd.revents & POLLIN)) {
           handler.readable(pfd.fd);
         }
@@ -265,10 +270,6 @@ class loop {
         if (handler._active && handler.want_write() &&
             (pfd.revents & POLLOUT)) {
           handler.writable(pfd.fd);
-        }
-
-        if (handler._active && (pfd.revents & (POLLERR | POLLHUP))) {
-          handler.error(pfd.fd);
         }
       }
       _processing_fds = false;

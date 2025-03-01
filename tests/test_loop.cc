@@ -250,7 +250,7 @@ TEST_CASE_METHOD(fake_clock_loop_test, "loop fd signals fired", "[loop]") {
   }
 
   SECTION("fd wants write") {
-    int bytes_written = 0;
+    ssize_t bytes_written = 0;
     p.writer_slots().writable = [&](int) {
       bytes_written = ::write(p.writer_fd(), msg, strlen(msg));
     };
@@ -361,7 +361,6 @@ TEST_CASE_METHOD(fake_clock_loop_test, "loop fd gets error events", "[loop]") {
 
   p.reader_close();
   cycle();
-  // REQUIRE(wval == 1);  // can't write anymore
   REQUIRE(err);
 }
 
