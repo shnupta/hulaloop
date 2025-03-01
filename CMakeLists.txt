@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(hulaloop
-    VERSION 0.0.1
+    VERSION 0.0.2
 		DESCRIPTION "C++ event loop"
     HOMEPAGE_URL "https://github.com/shnupta/hulaloop")
 
