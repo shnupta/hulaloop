@@ -1,6 +1,9 @@
 # hulaloop ⭕️
+[![release](https://img.shields.io/github/v/release/shnupta/hulaloop)](https://github.com/shnupta/hulaloop/releases)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/shnupta/hulaloop/main/LICENSE)
 ![build status](https://github.com/shnupta/hulaloop/actions/workflows/build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/shnupta/hulaloop/graph/badge.svg?token=8QP83GK99O)](https://codecov.io/gh/shnupta/hulaloop)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 A header-only C++ event loop.
 
