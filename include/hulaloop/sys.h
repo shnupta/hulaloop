@@ -2,11 +2,7 @@
 
 namespace hula {
 
-enum class sys_type
-{
-	unix,
-	mac
-};
+enum class sys_type { unix, mac };
 
 #if defined(__unix__)
 
@@ -20,4 +16,4 @@ static constexpr sys_type sys = sys_type::mac;
 
 #endif
 
-}
+}  // namespace hula

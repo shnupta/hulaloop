@@ -1,0 +1,11 @@
+---
+BasedOnStyle: Google
+IndentWidth: 2
+IncludeCategories:
+  - Regex: '^"(.*)"'
+    Priority: 1
+  - Regex: '^(<.*\.h>)'
+    Priority: 3
+  - Regex: '^<.*>'
+    Priority: 2
+SortIncludes: CaseInsensitive
