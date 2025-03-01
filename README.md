@@ -1,5 +1,5 @@
 # hulaloop ⭕️
-![Build Status](https://github.com/shnupta/hulaloop/actions/workflows/build.yml/badge.svg)
+![build status](https://github.com/shnupta/hulaloop/actions/workflows/build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/shnupta/hulaloop/graph/badge.svg?token=8QP83GK99O)](https://codecov.io/gh/shnupta/hulaloop)
 
 A header-only C++ event loop.
