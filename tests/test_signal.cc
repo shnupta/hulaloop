@@ -1,6 +1,6 @@
-#include <catch2/catch_test_macros.hpp>
-
 #include <hulaloop/signal.h>
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace hula::test {
 

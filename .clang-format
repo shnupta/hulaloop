@@ -4,8 +4,10 @@ IndentWidth: 2
 IncludeCategories:
   - Regex: '^"(.*)"'
     Priority: 1
-  - Regex: '^(<.*\.h>)'
-    Priority: 3
-  - Regex: '^<.*>'
+  - Regex: '^(<hulaloop.*\.h>)'
     Priority: 2
+  - Regex: '^(<.*\.h>)'
+    Priority: 4
+  - Regex: '^<.*>'
+    Priority: 3
 SortIncludes: CaseInsensitive
