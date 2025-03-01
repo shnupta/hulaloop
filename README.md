@@ -2,6 +2,7 @@
 A header-only C++ event loop.
 
 ![Build Status](https://github.com/shnupta/hulaloop/actions/workflows/c-cpp.yml/badge.svg)
+[![codecov](https://codecov.io/gh/shnupta/hulaloop/graph/badge.svg?token=8QP83GK99O)](https://codecov.io/gh/shnupta/hulaloop)
 
 ## API
 How do you use this thing?
