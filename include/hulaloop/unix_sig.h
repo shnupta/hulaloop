@@ -45,7 +45,6 @@ enum class sig
 	sigvtalrm = SIGVTALRM,
 	sigprof = SIGPROF,
 	sigwinch = SIGWINCH,
-	siginfo = SIGINFO,
 	sigusr1 = SIGUSR1,
 	sigusr2 = SIGUSR2
 };
