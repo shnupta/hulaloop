@@ -17,6 +17,7 @@ option(HULA_BUILD_DEMOS BOOL OFF)
 option(HULA_COVERAGE BOOL OFF)
 
 if (HULA_COVERAGE)
+	message("hulaloop => coverage build")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
 	SET(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
 endif()

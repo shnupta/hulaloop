@@ -52,9 +52,12 @@ jobs:
         ctest --output-on-failure
     - name: generate coverage
       run: |
+        echo "generating coverage info"
         lcov --capture --directory build --output-file coverage.info
+        echo "filtering coverage info"
         lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage_filtered.info
-        genhtml coverage_filtered.info --output-directory coverage_report
+        echo "generating coverage report"
+        genhtml coverage_filtered.info --output-directory coverage_report --verbose
     - name: Upload coverage report as artifact
       uses: actions/upload-artifact@v4
       with:
