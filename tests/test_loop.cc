@@ -111,6 +111,25 @@ TEST_CASE_METHOD(fake_clock_loop_test, "loop posts called in order", "[loop]")
 	REQUIRE(val == 100);
 }
 
+TEST_CASE_METHOD(fake_clock_loop_test, "loop posts longer time added later", "[loop]")
+{
+	int val = 1;
+
+	_loop.post(10ms, [&] { val = 23; });
+	_loop.post(1s, [&] { val = 100; });
+
+	cycle();
+	REQUIRE(val == 1);
+
+	fake_clock::advance(11ms);
+	cycle();
+	REQUIRE(val == 23);
+
+	fake_clock::advance(1s);
+	cycle();
+	REQUIRE(val == 100);
+}
+
 TEST_CASE_METHOD(loop_test, "loop cancel posted callback", "[loop]")
 {
 	int val = 1;
@@ -194,6 +213,15 @@ TEST_CASE_METHOD(loop_test, "loop signal handler closed during cycle", "[loop]")
 
 	cycle();
 	REQUIRE(val == 99);
+}
+
+TEST_CASE_METHOD(loop_test, "loop real run with callback", "[loop]")
+{
+	loop<> l;
+
+	l.post([&] { l.stop(); });
+
+	l.run();
 }
 
 }
