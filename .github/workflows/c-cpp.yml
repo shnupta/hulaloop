@@ -14,8 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: make build dir
-      run: mkdir -p build
-      run: cd build
+      run: mkdir -p build; cd build
     - name: cmake
       run: cmake -DHULA_BUILD_DEMOS=ON .. 
     - name: make
