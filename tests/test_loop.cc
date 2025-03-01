@@ -172,7 +172,7 @@ TEST_CASE_METHOD(fake_clock_loop_test, "loop fd signals fired", "[loop]") {
 
   auto c = _loop.add_fd(p.reader_fd(), p.reader_slots(), fd_events::read);
 
-  SECTION("no data available, no read signal") {
+  {
     cycle();
     REQUIRE(val == 1);
   }
@@ -181,12 +181,12 @@ TEST_CASE_METHOD(fake_clock_loop_test, "loop fd signals fired", "[loop]") {
   auto* msg = "hello";
   ::write(p.writer_fd(), msg, strlen(msg));
 
-  SECTION("data available to read, signal fired") {
+  {
     cycle();
     REQUIRE(val == 2);
   }
 
-  SECTION("fd wants write") {
+  {
     ssize_t bytes_written = 0;
     p.writer_slots().writable = [&](int) {
       bytes_written = ::write(p.writer_fd(), msg, strlen(msg));
