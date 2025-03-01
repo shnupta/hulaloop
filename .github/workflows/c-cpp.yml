@@ -27,7 +27,12 @@ jobs:
     - name: test
       run: |
         cd build
-        ctest --output-on-failure
+        ctest --output-junit unit_test_results.xml --output-on-failure
+    - name: upload test results to codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   build_coverage:
 
