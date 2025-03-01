@@ -39,7 +39,7 @@ jobs:
     - name: fetch dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y catch2 gcov
+        sudo apt-get install -y catch2 lcov
     - name: build
       run: |
         mkdir -p build
@@ -50,4 +50,14 @@ jobs:
       run: |
         cd build
         ctest -T coverage --output-on-failure
+    - name: generate coverage
+      run: |
+        lcov --capture --directory build --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage_filtered.info
+        genhtml coverage_filtered.info --output-directory coverage_report
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage_report
 

@@ -17,7 +17,7 @@ option(HULA_BUILD_DEMOS BOOL OFF)
 option(HULA_COVERAGE BOOL OFF)
 
 if (HULA_COVERAGE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif()
 
 add_library(hulaloop INTERFACE)
