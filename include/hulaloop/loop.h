@@ -27,9 +27,6 @@ struct loop_test;
 struct fake_clock_loop_test;
 }  // namespace test
 
-// generic callback
-using callback = std::function<void()>;
-
 enum class fd_events {
   read = POLLIN,
   write = POLLOUT,
@@ -68,15 +65,15 @@ class loop {
 
   // immediately called in the next cycle.
   // callback can be manually removed by calling cancel_callback(id).
-  uint64_t post(callback cb) { return post(0ns, cb); }
+  uint64_t post(slot<> cb) { return post(0ns, cb); }
 
   // immediately called in the next cycle.
   // close the handle to cancel the callback.
-  closer schedule(callback cb) { return schedule(0ns, cb); }
+  closer schedule(slot<> cb) { return schedule(0ns, cb); }
 
   // called after fire_in duration has passed
   // callback can be manually removed by calling cancel_callback(id).
-  uint64_t post(std::chrono::nanoseconds fire_in, callback cb) {
+  uint64_t post(clock::duration fire_in, slot<> cb) {
     auto id = _next_callback_id++;
     auto fire_at = clock::now() + fire_in;
 
@@ -91,7 +88,7 @@ class loop {
 
   // called after fire_in duration has passed
   // close the handle to cancel the callback.
-  closer schedule(std::chrono::nanoseconds fire_in, callback cb) {
+  closer schedule(clock::duration fire_in, slot<> cb) {
     auto id = post(fire_in, cb);
     return closer([=, this] { cancel_callback(id); });
   }
@@ -186,7 +183,7 @@ class loop {
   struct callback_context {
     uint64_t _id{};
     clock::time_point _fire_at;
-    callback _cb;
+    slot<> _cb;
 
     void operator()() { _cb(); }
   };

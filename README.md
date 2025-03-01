@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/shnupta/hulaloop/graph/badge.svg?token=8QP83GK99O)](https://codecov.io/gh/shnupta/hulaloop)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A header-only C++ event loop.
+A header-only event loop.
 
 ## API
 
