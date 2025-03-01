@@ -44,7 +44,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DHULA_BUILD_DEMOS=ON ..
+        cmake -DHULA_BUILD_DEMOS=ON -DHULA_COVERAGE=ON ..
         make
     - name: test
       run: |
