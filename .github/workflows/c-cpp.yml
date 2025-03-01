@@ -7,17 +7,18 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build debug:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
+    - name: make build dir
+      run: mkdir -p build
+      run: cd build
+    - name: cmake
+      run: cmake -DHULA_BUILD_DEMOS=ON .. 
     - name: make
       run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: ctest
+      run: ctest
