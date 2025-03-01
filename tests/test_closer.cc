@@ -29,7 +29,7 @@ TEST_CASE("closer closes on destruction", "[closer]") {
   REQUIRE(val == 2);
 }
 
-TEST_CASE("closer move constructing does not close", "[closer]") {
+TEST_CASE("closer move constructing does not close new", "[closer]") {
   int val = 1;
   closer c1([&] { val++; });
 
@@ -48,6 +48,19 @@ TEST_CASE("closer move constructed closes correctly", "[closer]") {
   REQUIRE(val == 2);
 }
 
-// TODO: move assignment
+TEST_CASE("closer move assigning closes original", "[closer]") {
+  int val = 1;
+  closer c1([&] { val = 3; });
+  closer c2([&] { val = 99; });
+
+  c1 = std::move(c2);
+  REQUIRE(val == 3);
+
+  c2.close();
+  REQUIRE(val == 3);
+
+  c1.close();
+  REQUIRE(val == 99);
+}
 
 }  // namespace hula::test

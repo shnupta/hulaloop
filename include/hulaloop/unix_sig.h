@@ -52,7 +52,7 @@ using signal = hula::signal<void, struct sig_slot_tag>;
 
 class signal_registry {
  public:
-  static closer connect(sig s, signal::slot sl) {
+  static closer connect(sig s, signal::slot_type sl) {
     auto [it, inserted] = instance()._signals.try_emplace(s, unix::signal{});
     if (inserted) {
       std::signal(static_cast<int>(s), &signal_registry::dispatch);

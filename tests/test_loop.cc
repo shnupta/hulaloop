@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
+#include <cstring>
 
 #include <hulaloop/loop.h>
+#include <unistd.h>
 
 namespace hula::test {
 
@@ -12,7 +14,8 @@ struct fake_clock {
   using duration = underlying_clock::duration;
   using time_point = underlying_clock::time_point;
 
-  static inline time_point current{};
+  static inline constexpr time_point k_default = time_point{} + 1s;
+  static inline time_point current = k_default;
 
   static constexpr bool is_steady = underlying_clock::is_steady;
 
@@ -20,13 +23,41 @@ struct fake_clock {
 
   static void advance(duration d) { current += d; }
 
-  static void reset() { current = {}; }
+  static void reset() { current = k_default; }
 };
 
 struct loop_test {
   loop<> _loop;
 
   void cycle() { _loop.do_cycle(); }
+};
+
+// read write pair of fds from pipe()
+class fd_pair {
+ public:
+  explicit fd_pair() {
+    int res = pipe(_fds);
+    if (res != 0) {
+      throw std::runtime_error("pipe failed to setup fd_pair");
+    }
+  }
+
+  ~fd_pair() {
+    reader_close();
+    writer_close();
+  }
+
+  int reader_fd() const { return _fds[0]; }
+  fd_slots& reader_slots() { return _slots[0]; }
+  void reader_close() { close(reader_fd()); }
+
+  int writer_fd() const { return _fds[1]; }
+  fd_slots& writer_slots() { return _slots[1]; }
+  void writer_close() { close(writer_fd()); }
+
+ private:
+  int _fds[2];
+  fd_slots _slots[2];
 };
 
 struct fake_clock_loop_test {
@@ -192,11 +223,146 @@ TEST_CASE_METHOD(loop_test, "loop signal handler closed during cycle",
 }
 
 TEST_CASE_METHOD(loop_test, "loop real run with callback", "[loop]") {
-  loop<> l;
+  _loop.post([&] { _loop.stop(); });
+  _loop.run();
+}
 
-  l.post([&] { l.stop(); });
+TEST_CASE_METHOD(fake_clock_loop_test, "loop fd signals fired", "[loop]") {
+  int val = 1;
 
-  l.run();
+  fd_pair p{};
+  p.reader_slots().readable = [&](int) { val = 2; };
+
+  auto c = _loop.add_fd(p.reader_fd(), p.reader_slots(), fd_events::read);
+
+  SECTION("no data available, no read signal") {
+    cycle();
+    REQUIRE(val == 1);
+  }
+
+  fake_clock::advance(1s);
+  auto* msg = "hello";
+  ::write(p.writer_fd(), msg, strlen(msg));
+
+  SECTION("data available to read, signal fired") {
+    cycle();
+    REQUIRE(val == 2);
+  }
+
+  SECTION("fd wants write") {
+    int bytes_written = 0;
+    p.writer_slots().writable = [&](int) {
+      bytes_written = ::write(p.writer_fd(), msg, strlen(msg));
+    };
+
+    auto wc = _loop.add_fd(p.writer_fd(), p.writer_slots(), fd_events::write);
+
+    cycle();
+    REQUIRE(bytes_written == strlen(msg));
+  }
+}
+
+TEST_CASE_METHOD(fake_clock_loop_test, "loop fd removed during processing",
+                 "[loop]") {
+  fd_pair p{};
+
+  int rval = 0;
+  int wval = 0;
+
+  p.reader_slots().readable = [&](int) { rval++; };
+  p.writer_slots().writable = [&](int) {
+    wval++;
+    _loop.remove_fd(p.reader_fd());
+  };
+  auto rc = _loop.add_fd(p.reader_fd(), p.reader_slots(), fd_events::read);
+  auto wc = _loop.add_fd(p.writer_fd(), p.writer_slots(), fd_events::write);
+
+  auto* msg = "hello";
+  auto msglen = strlen(msg);
+  ::write(p.writer_fd(), msg, msglen);
+
+  // given writer is added second, we should see rval increment only once
+  // despite data being available to read
+  cycle();
+  REQUIRE(rval == 1);
+  REQUIRE(wval == 1);
+
+  ::write(p.writer_fd(), msg, msglen);
+  cycle();
+  REQUIRE(rval == 1);
+  REQUIRE(wval == 2);
+}
+
+TEST_CASE_METHOD(fake_clock_loop_test, "loop fd pending addition", "[loop]") {
+  fd_pair p{};
+
+  int rval = 0;
+  int wval = 0;
+
+  closer rc;
+
+  p.reader_slots().readable = [&](int) {
+    rval++;
+    _loop.remove_fd(p.reader_fd());
+  };
+  p.writer_slots().writable = [&](int) {
+    wval++;
+
+    if (!rc)
+      rc = _loop.add_fd(p.reader_fd(), p.reader_slots(), fd_events::read);
+  };
+
+  auto wc = _loop.add_fd(p.writer_fd(), p.writer_slots(), fd_events::write);
+
+  cycle();
+  REQUIRE(rval == 0);
+  REQUIRE(wval == 1);  // reader fd has been added
+
+  cycle();
+  REQUIRE(rval == 0);  // still nothing to read
+  REQUIRE(wval == 2);
+
+  auto* msg = "hello";
+  auto msglen = strlen(msg);
+  ::write(p.writer_fd(), msg, msglen);
+
+  cycle();
+  REQUIRE(rval == 1);  // reader fd removed during loop
+  REQUIRE(wval == 3);
+
+  ::write(p.writer_fd(), msg, msglen);
+  cycle();
+  REQUIRE(rval == 1);  // no longer part of fd processing
+  REQUIRE(wval == 4);  // technically adds the fd again
+}
+
+TEST_CASE_METHOD(fake_clock_loop_test, "loop fd gets error events", "[loop]") {
+  fd_pair p{};
+
+  int wval = 0;
+
+  bool err = false;
+
+  closer rc;
+
+  p.writer_slots().writable = [&](int) { wval++; };
+  p.writer_slots().error = [&](int) { err = true; };
+
+  auto wc =
+      _loop.add_fd(p.writer_fd(), p.writer_slots(), fd_events::read_write);
+
+  auto* msg = "hello";
+  auto msglen = strlen(msg);
+  ::write(p.writer_fd(), msg, msglen);
+
+  cycle();
+  REQUIRE(wval == 1);
+  REQUIRE(!err);
+
+  p.reader_close();
+  cycle();
+  REQUIRE(wval == 1);  // can't write anymore
+  REQUIRE(err);
 }
 
 }  // namespace hula::test

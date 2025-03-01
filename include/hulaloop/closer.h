@@ -6,7 +6,7 @@ namespace hula {
 
 // once closed, will not fire again.
 // closes on destruction.
-class closer {
+class [[nodiscard]] closer {
  public:
   using callback = std::function<void()>;
 

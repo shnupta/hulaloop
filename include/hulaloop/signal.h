@@ -15,7 +15,7 @@ namespace detail {
 
 template <class T, class Tag = void>
 struct slot_picker {
-  using type = std::function<void(T&&)>;
+  using type = std::function<void(T)>;
 };
 
 template <class Tag>
@@ -25,12 +25,15 @@ struct slot_picker<void, Tag> {
 
 }  // namespace detail
 
+template <class T = void, class Tag = void>
+using slot = typename detail::slot_picker<T, Tag>::type;
+
 // signal which can fire, calling all connected slots with argument of type T.
 // closing the returned closer will disconnect.
 template <class T = void, class Tag = void>
 class signal {
  public:
-  using slot = detail::slot_picker<T, Tag>::type;
+  using slot_type = slot<T, Tag>;
 
   template <class U = T, typename = std::enable_if<std::is_void_v<T>>>
   void operator()() {
@@ -60,7 +63,7 @@ class signal {
 
   // closing the handle will guarantee that the slot will not be triggered
   // afterwards
-  closer connect(slot s) {
+  closer connect(slot_type s) {
     auto id = _next_id++;
     if (_during_call) {
       _pending_connections.emplace_back(slot_info{
@@ -118,7 +121,7 @@ class signal {
 
   struct slot_info {
     uint64_t _id;
-    slot _slot;
+    slot_type _slot;
     bool _active = true;
 
     template <class U = T, typename = std::enable_if<std::is_void_v<T>, void>>

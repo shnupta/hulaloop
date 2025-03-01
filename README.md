@@ -8,7 +8,6 @@
 A header-only C++ event loop.
 
 ## API
-How do you use this thing?
 
 ### Signals and Slots
 Somewhat inspired by Qt, a `hula::signal<T, Tag>` represents a function that can fire, by calling any connected `hula::slot<T, Tag>`.
@@ -27,12 +26,15 @@ class email_fetcher
 public:
     using new_email_signal = hula::signal<email_id>;
     
-    closer listen_to_new_emails(new_email_signal::slot s)
-    {
+    closer listen_to_new_emails(new_email_signal::slot s) {
         return _new_email_signal.connect(s);
     }
 
 private:
+    void on_new_email() {
+        auto id = //...
+        _new_email_signal(id); // all connected slots are called
+    }
     hula::signal<email_id> _new_email_signal;
 };
 ```
