@@ -1,6 +1,8 @@
 # hulaloop ⭕️
 A header-only C++ event loop.
 
+![Build Status](https://github.com/shnupta/hulaloop/actions/workflows/c-cpp.yml/badge.svg)
+
 ## API
 How do you use this thing?
 

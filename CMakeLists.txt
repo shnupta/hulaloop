@@ -14,6 +14,11 @@ set(HULALOOP_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 include_directories(${HULALOOP_INCLUDE_DIR})
 
 option(HULA_BUILD_DEMOS BOOL OFF)
+option(HULA_COVERAGE BOOL OFF)
+
+if (HULA_COVERAGE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+endif()
 
 add_library(hulaloop INTERFACE)
 add_library(hulaloop::hulaloop ALIAS hulaloop)

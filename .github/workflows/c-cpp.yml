@@ -27,4 +27,27 @@ jobs:
     - name: test
       run: |
         cd build
-        ctest
+        ctest --output-on-failure
+
+  build_coverage:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: fetch catch2
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y catch2 lcov
+    - name: build
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DHULA_BUILD_DEMOS=ON ..
+        make
+    - name: test
+      run: |
+        cd build
+        ctest -T coverage --output-on-failure
+
