@@ -7,6 +7,26 @@
 
 A header-only event loop.
 
+## Usage
+It is recommended to use CMake's `FetchContent` to use hulaloop inside your project.
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(hulaloop
+	GIT_REPOSITORY https://github.com/shnupta/hulaloop.git
+	GIT_TAG v0.0.3
+	GIT_PROGRESS TRUE
+	GIT_SHALLOW TRUE
+	EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(hulaloop)
+
+# ...
+
+target_link_libraries(myapp PRIVATE hulaloop::hulaloop)
+```
+
 ## API
 
 ### Signals and Slots
