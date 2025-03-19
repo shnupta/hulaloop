@@ -14,14 +14,23 @@ class repeater {
   explicit repeater(loop<clock>& loop, clock::duration interval, slot<> slot)
       : _loop(loop), _interval(interval), _slot(slot) {}
 
-  void start() { schedule(); }
+  explicit repeater(loop<clock>& loop) : _loop(loop) {}
+
+  void set_interval(clock::duration interval) { _interval = interval; }
+
+  void set_slot(slot<> slot) { _slot = slot; }
+
+  void start() {
+    assert(_slot);
+    schedule();
+  }
 
   void stop() { _closer.close(); }
 
  private:
   void fire() {
-    _slot();
     schedule();
+    _slot();
   }
 
   void schedule() {
